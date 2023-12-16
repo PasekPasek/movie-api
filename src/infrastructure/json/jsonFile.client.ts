@@ -5,24 +5,24 @@ import config from 'config';
 import logger from '../../shared/utils/logger.utils.js';
 import path from 'path';
 
-export type Movie = {
+export type MovieJsonDocument = {
   id: string;
   title: string;
   year: number;
   runtime: number;
   genres: string[];
   director: string;
-  actors: string;
-  plot: string;
-  posterUrl: string;
+  actors?: string;
+  plot?: string;
+  posterUrl?: string;
 };
 
-export type JsonDb = {
-  movies: Movie[];
+export type JsonDbDocument = {
+  movies: MovieJsonDocument[];
   genres: string[];
 };
 
-const defaultData: JsonDb = {
+const defaultData: JsonDbDocument = {
   movies: [],
   genres: [
     'Comedy',
@@ -51,25 +51,24 @@ const defaultData: JsonDb = {
 
 @Service()
 export class JsonFile {
-  private jsonFile: Low<JsonDb> | null = null;
+  private jsonFile: Low<JsonDbDocument> | null = null;
   private readonly jsonFilePath: string = config.get('data.filePath');
 
-  async connect(): Promise<Low<JsonDb>> {
+  async connect(): Promise<Low<JsonDbDocument>> {
     if (this.jsonFile !== null) {
       return this.jsonFile;
     }
 
-    // get root path of node
     const rootPath = process.cwd();
 
     const jsonFilePath = path.join(rootPath, this.jsonFilePath);
-    this.jsonFile = await JSONPreset<JsonDb>(jsonFilePath, defaultData);
+    this.jsonFile = await JSONPreset<JsonDbDocument>(jsonFilePath, defaultData);
     logger.info(`Connected to file ${jsonFilePath}`);
 
     return this.jsonFile;
   }
 
-  getFile(): Low<JsonDb> {
+  getFile(): Low<JsonDbDocument> {
     if (this.jsonFile === null) {
       throw new Error('JsonFile not connected');
     }
