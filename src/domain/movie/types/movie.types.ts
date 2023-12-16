@@ -16,6 +16,6 @@ export type MovieDocument = Movie & {
 }
 
 export type GetMoviesParams = {
-  duration: number;
-  genres: string[];
+  duration?: number;
+  genres?: string[];
 }
