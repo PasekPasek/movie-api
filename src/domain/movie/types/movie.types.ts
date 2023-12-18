@@ -12,7 +12,7 @@ export type Movie = {
 export type CreateMovieDTO = Movie
 
 export type MovieDocument = Movie & {
-  id: string
+  id: number
 }
 
 export type GetMoviesParams = {

@@ -25,7 +25,8 @@ export class MoviesService implements MovieDomainService {
     if (params.genres !== undefined) {
       results = filterMoviesByGenres(results, params.genres);
     } else {
-      results = [getRandomElement(results)];
+      const randomElement = getRandomElement(results);
+      results = randomElement ? [randomElement] : [];
     }
 
     return results;
