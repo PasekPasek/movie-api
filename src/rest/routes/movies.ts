@@ -22,9 +22,9 @@ export class MovieRouter extends ServiceRouter {
       ...(req.query.duration !== undefined && { duration: Number(req.query.duration as string) }),
     };
 
-    const allMovies = await this.movieService.getMovies(getMoviesParams);
+    const movies = await this.movieService.getMovies(getMoviesParams);
 
-    return res.send({ allMovies });
+    return res.send({ allMovies: movies });
   }
 
   async addMovie(req: Request, res: Response): Promise<Response> {
