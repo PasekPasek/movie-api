@@ -53,7 +53,7 @@ export const filterMoviesByGenres = <T extends MovieDocument>(movies: T[], genre
   return moviesFilteredByGenres;
 };
 
-export const compareMovies = <T extends Movie>(movieA: T, movieB: T): boolean => {
+const compareMovies = <T extends Movie>(movieA: T, movieB: T): boolean => {
   return movieA.title === movieB.title && movieA.year === movieB.year;
 };
 

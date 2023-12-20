@@ -118,7 +118,7 @@ describe('Movie Utils', () => {
     });
   });
 
-  describe('isMovieAlreadyInList', () => {
+  describe('isMovieAlreadyInList (checks movie by year and title)', () => {
     it('should return true if movie is already in list', () => {
       // given
       const movies: MovieDocument[] = [
