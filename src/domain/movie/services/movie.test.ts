@@ -169,6 +169,23 @@ describe('movie service', () => {
     await expect(t).rejects.toThrow('"title" length must be less than or equal to 255 characters long');
   });
 
+  it('adding new record should throw error on record with duplicated genres', async () => {
+    // given
+    const newMovieDoc = {
+      title: 'test',
+      year: 2020,
+      runtime: 20,
+      genres: ['Drama', 'drama'],
+      director: 'test',
+    } as unknown;
+
+    // when
+    const t = movieService.addMovie(newMovieDoc as MovieDocument);
+
+    // then
+    await expect(t).rejects.toThrow('"genres[1]" contains a duplicate value');
+  });
+
   it('getting movies should throw error on invalid genre', async () => {
     // given
     const params = { genres: ['Drama', 'Invalid'] };
