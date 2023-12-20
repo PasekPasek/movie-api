@@ -197,6 +197,28 @@ describe('movie service', () => {
     await expect(t).rejects.toThrow(BadRequestError);
   });
 
+  it('getting movies should throw error on duplicated genre params', async () => {
+    // given
+    const params = { genres: ['Drama', 'drama'] };
+
+    // when
+    const t = movieService.getMovies(params);
+
+    // then
+    await expect(t).rejects.toThrow('"genres[1]" contains a duplicate value');
+  });
+
+  it('getting movies should throw error on empty genre params', async () => {
+    // given
+    const params = { genres: [] };
+
+    // when
+    const t = movieService.getMovies(params);
+
+    // then
+    await expect(t).rejects.toThrow('"genres" must contain at least 1 items');
+  });
+
   it('getting movies should throw error on invalid genre type', async () => {
     // given
     const params = { genres: 'Drama' } as unknown;
