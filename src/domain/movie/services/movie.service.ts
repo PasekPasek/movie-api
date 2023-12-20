@@ -64,10 +64,11 @@ export class MoviesService implements MovieDomainService {
 
   async addMovie(moviePayload: CreateMovieDTO): Promise<void> {
     await addMovieValidationSchema.validateAsync(moviePayload);
-    // we check by title and year if movie already exists
-    await this.validateIfMovieIsNotDuplicated(moviePayload)
     await this.validateGenres(moviePayload.genres);
 
+    // we check by title and year if movie already exists
+    await this.validateIfMovieIsNotDuplicated(moviePayload)
+    
     const allMovies = await this.movieRepository.getAllMovies();
     const lastMovieId = allMovies[allMovies.length - 1]?.id;
 
