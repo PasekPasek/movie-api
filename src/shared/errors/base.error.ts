@@ -5,7 +5,7 @@ export type ErrorArgs = {
   data?: Record<string, unknown>;
 };
 
-export class BaseError extends Error {
+export abstract class BaseError extends Error {
   public readonly name: string;
   public readonly status: number;
   public readonly data: Record<string, unknown> | undefined;

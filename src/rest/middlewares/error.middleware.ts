@@ -12,6 +12,7 @@ type JoiErrorMessage = {
   details: JoiErrorDetails;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorMiddleware = (error: HttpException, request: Request, response: Response, next: NextFunction): void => {
   let status = error.status ?? 500;
   let message: string | JoiErrorMessage = error.message ?? 'Something went wrong';

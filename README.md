@@ -1,8 +1,31 @@
-## The Software House - Node.js Developer recruitment task
+## Node.js Developer
 
 ### GETTING STARTED
 
-WIP
+1. Install dependencies
+
+```
+npm install
+```
+
+2. Run the dev server
+
+```
+npm run dev
+```
+
+3. Open swagger documentation
+
+```
+http://localhost:8080/api-docs/
+```
+
+### RUNNING TESTS
+
+```
+npm run test
+```
+
 
 ### TASK Description
 

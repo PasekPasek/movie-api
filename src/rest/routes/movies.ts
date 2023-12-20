@@ -24,7 +24,7 @@ export class MovieRouter extends ServiceRouter {
 
     const movies = await this.movieService.getMovies(getMoviesParams);
 
-    return res.send({ allMovies: movies });
+    return res.send({ movies });
   }
 
   async addMovie(req: Request, res: Response): Promise<Response> {

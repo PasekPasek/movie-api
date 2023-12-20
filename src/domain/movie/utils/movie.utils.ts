@@ -1,4 +1,4 @@
-import { MovieDocument } from '../types/movie.types.js';
+import { Movie, MovieDocument } from '../types/movie.types.js';
 
 export const getRandomElement = <T>(array: T[]): T | undefined => {
   if (array.length === 0) {
@@ -17,13 +17,13 @@ export const filterMoviesByDuration = <T extends MovieDocument>(
   duration: number | undefined,
   offSet: number = 10,
 ): T[] => {
-  if (!duration) {
+  if (duration === undefined) {
     return movies;
   }
 
   const min = duration - offSet;
   const max = duration + offSet;
-  return movies.filter((movie) => movie.runtime > min && movie.runtime < max);
+  return movies.filter((movie) => movie.runtime >= min && movie.runtime <= max);
 };
 
 export const filterMoviesByGenres = <T extends MovieDocument>(movies: T[], genres: string[] = []): T[] => {
@@ -34,8 +34,8 @@ export const filterMoviesByGenres = <T extends MovieDocument>(movies: T[], genre
   const hitsFrequencyMap = new Map<number, number>();
   const moviesFilteredByGenres = movies.filter((movie) => {
     let hits = 0;
-    genres.forEach((genre) => {
-      if (movie.genres.includes(genre)) {
+    genres.forEach((genreInQuery) => {
+      if (movie.genres.find((movieGenre) => movieGenre.toLowerCase() === genreInQuery.toLowerCase())) {
         hits++;
       }
     });
@@ -52,3 +52,11 @@ export const filterMoviesByGenres = <T extends MovieDocument>(movies: T[], genre
 
   return moviesFilteredByGenres;
 };
+
+export const compareMovies = <T extends Movie>(movieA: T, movieB: T): boolean => {
+  return movieA.title === movieB.title && movieA.year === movieB.year;
+};
+
+export const isMovieAlreadyInList = <T extends Movie>(movie: T, movies: T[]): boolean => {
+  return movies.some((movieB) => compareMovies(movie, movieB));
+}

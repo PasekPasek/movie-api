@@ -7,15 +7,45 @@ import { MOVIE_REPOSITORY } from '../../../di/serviceTokens.js';
 import { addMovieValidationSchema } from '../validators/addMovieValidationSchema.js';
 import { getMoviesValidationSchema } from '../validators/getMoviesValidationSchema.js';
 import { BadRequestError } from '../../../shared/errors/badRequest.error.js';
-import { filterMoviesByDuration, filterMoviesByGenres, getRandomElement } from '../utils/movie.utils.js';
+import {
+  filterMoviesByDuration,
+  filterMoviesByGenres,
+  getRandomElement,
+  isMovieAlreadyInList,
+} from '../utils/movie.utils.js';
 import { InternalServiceError } from '../../../shared/errors/internalService.error.js';
 
 @Service()
 export class MoviesService implements MovieDomainService {
   constructor(@Inject(MOVIE_REPOSITORY) private readonly movieRepository: MovieDomainRepository) {}
 
+  private async validateGenres(genres: string[]): Promise<void> {
+    const allowedGenres = (await this.movieRepository.getAllGenres()).map((genre) => genre.toLowerCase());
+    if (!allowedGenres.length) {
+      logger.error('Could not validate movie genres');
+      throw new InternalServiceError({ message: 'Could not validate movie genres' });
+    }
+
+    if (!genres.map((genre) => genre.toLowerCase()).every((genre) => allowedGenres.includes(genre))) {
+      logger.error(`Invalid genres: ${genres}`);
+      throw new BadRequestError({ message: `Invalid genres: ${genres}`, data: { allowedGenres } });
+    }
+  }
+
+  private async validateIfMovieIsNotDuplicated(movie: CreateMovieDTO): Promise<void> {
+    const allMovies = await this.movieRepository.getAllMovies();
+
+    const isDuplicated = isMovieAlreadyInList(movie, allMovies);
+
+    if (isDuplicated) {
+      logger.error(`Movie already exists: ${movie.title} (${movie.year})})`);
+      throw new BadRequestError({ message: `Movie already exists: ${movie.title} (${movie.year})` });
+    }
+  }
+
   async getMovies(params: GetMoviesParams): Promise<MovieDocument[]> {
     await getMoviesValidationSchema.validateAsync(params);
+    if (params.genres?.length) await this.validateGenres(params.genres);
     let results = await this.movieRepository.getAllMovies();
 
     if (params.duration !== undefined) {
@@ -34,16 +64,8 @@ export class MoviesService implements MovieDomainService {
 
   async addMovie(moviePayload: CreateMovieDTO): Promise<void> {
     await addMovieValidationSchema.validateAsync(moviePayload);
-
-    const allowedGenres = (await this.movieRepository.getAllGenres()).map((genre) => genre.toLowerCase());
-
-    if (!allowedGenres.length) {
-      throw new InternalServiceError({ message: 'No allowed genres found' });
-    }
-
-    if (!moviePayload.genres.map((genre) => genre.toLowerCase()).every((genre) => allowedGenres.includes(genre))) {
-      throw new BadRequestError({ message: 'Invalid genres', data: { allowedGenres } });
-    }
+    await this.validateIfMovieIsNotDuplicated(moviePayload)
+    await this.validateGenres(moviePayload.genres);
 
     const allMovies = await this.movieRepository.getAllMovies();
     const lastMovieId = allMovies[allMovies.length - 1]?.id;
@@ -54,6 +76,5 @@ export class MoviesService implements MovieDomainService {
     };
 
     await this.movieRepository.addMovie(newMovie);
-    logger.info(`Movie ${newMovie.title} added`);
   }
 }

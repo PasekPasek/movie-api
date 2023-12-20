@@ -1,5 +1,5 @@
 import { MovieDocument } from '../types/movie.types';
-import { filterMoviesByDuration, filterMoviesByGenres, getRandomElement } from './movie.utils';
+import { filterMoviesByDuration, filterMoviesByGenres, getRandomElement, isMovieAlreadyInList } from './movie.utils';
 
 describe('Movie Utils', () => {
   describe('getRandomElement', () => {
@@ -69,18 +69,19 @@ describe('Movie Utils', () => {
         { runtime: 100000 },
         { runtime: 12 },
         { runtime: 8 },
+        { runtime: 5 },
       ];
 
       // when
       const result = filterMoviesByDuration(moviesWithDuration as MovieDocument[], 10, 5);
 
       // then
-      expect(result).toMatchObject([{ runtime: 10 }, { runtime: 12 }, { runtime: 8 }]);
+      expect(result).toMatchObject([{ runtime: 10 }, { runtime: 15 }, { runtime: 12 }, { runtime: 8 }, { runtime: 5 }]);
     });
   });
 
   describe('filterMoviesByGenres', () => {
-    it('should return only movies filtered by provided genres', () => {
+    it('should return only movies filtered by provided genres, case not sensitive', () => {
       // given
       const moviesWithDuration: Pick<MovieDocument, 'id' | 'genres'>[] = [
         { id: 1, genres: ['genre8'] },
@@ -90,7 +91,7 @@ describe('Movie Utils', () => {
       ];
 
       // when
-      const result = filterMoviesByGenres(moviesWithDuration as MovieDocument[], ['genre1', 'genre3', 'genre4']);
+      const result = filterMoviesByGenres(moviesWithDuration as MovieDocument[], ['Genre1', 'genre3', 'gEnre4']);
 
       // then
       expect(result).toMatchObject([
@@ -114,6 +115,40 @@ describe('Movie Utils', () => {
 
       // then
       expect(result).toMatchObject(moviesWithDuration);
+    });
+  });
+
+  describe('isMovieAlreadyInList', () => {
+    it('should return true if movie is already in list', () => {
+      // given
+      const movies: MovieDocument[] = [
+        { id: 1, title: 'title1', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+        { id: 2, title: 'title2', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+        { id: 3, title: 'title3', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+      ];
+      const movie: MovieDocument = { id: 2, title: 'title2', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' };
+
+      // when
+      const result = isMovieAlreadyInList(movie, movies);
+
+      // then
+      expect(result).toBeTruthy();
+    });
+
+    it('should return false if movie is not in list', () => {
+      // given
+      const movies: MovieDocument[] = [
+        { id: 1, title: 'title1', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+        { id: 2, title: 'title2', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+        { id: 3, title: 'title3', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' },
+      ];
+      const movie: MovieDocument = { id: 2, title: 'title5', year: 2020, runtime: 100, genres: ['genre1', 'genre2'], director: 'director1' };
+
+      // when
+      const result = isMovieAlreadyInList(movie, movies);
+
+      // then
+      expect(result).toBeFalsy();
     });
   });
 });

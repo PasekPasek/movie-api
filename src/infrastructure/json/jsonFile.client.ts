@@ -4,49 +4,12 @@ import { type Low } from 'lowdb';
 import config from 'config';
 import logger from '../../shared/utils/logger.utils.js';
 import path from 'path';
-
-export type MovieJsonDocument = {
-  id: string;
-  title: string;
-  year: number;
-  runtime: number;
-  genres: string[];
-  director: string;
-  actors?: string;
-  plot?: string;
-  posterUrl?: string;
-};
-
-export type JsonDbDocument = {
-  movies: MovieJsonDocument[];
-  genres: string[];
-};
+import { JsonDbDocument } from '../../domain/movie/types/movie.types.js';
+import { InternalServiceError } from '../../shared/errors/internalService.error.js';
 
 const defaultData: JsonDbDocument = {
   movies: [],
-  genres: [
-    'Comedy',
-    'Fantasy',
-    'Crime',
-    'Drama',
-    'Music',
-    'Adventure',
-    'History',
-    'Thriller',
-    'Animation',
-    'Family',
-    'Mystery',
-    'Biography',
-    'Action',
-    'Film-Noir',
-    'Romance',
-    'Sci-Fi',
-    'War',
-    'Western',
-    'Horror',
-    'Musical',
-    'Sport',
-  ],
+  genres: [],
 };
 
 @Service()
@@ -70,7 +33,7 @@ export class JsonFile {
 
   getFile(): Low<JsonDbDocument> {
     if (this.jsonFile === null) {
-      throw new Error('JsonFile not connected');
+      throw new InternalServiceError({message: 'JsonFile not connected'});
     }
 
     return this.jsonFile;
